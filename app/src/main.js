@@ -1,7 +1,7 @@
 // Vice Cover Studio — UI, state and export.
 // Wires the controls in index.html to the cover engine in cover.js,
 // keeps an undo/redo history, and exports PNGs at 1080x1080,
-// 1080x1350 and 1920x1080. Also powers deterministic screenshot
+// 1080x1350, 1920x1080 and 1080x1920. Also powers deterministic screenshot
 // scenes (?shot=cover / ?shot=editor) for the entry's screenshots.
 
 import {
@@ -413,17 +413,17 @@ async function exportPng(sizeKey) {
 }
 
 async function exportAllPngs() {
-  setStatus('Exporting all three sizes…');
+  setStatus('Exporting all four sizes…');
   for (const key of Object.keys(SIZES)) {
     const size = SIZES[key];
     const off = renderToCanvas(key);
     await downloadCanvas(off, `vice-cover-${key}-${size.w}x${size.h}.png`);
     await new Promise((r) => setTimeout(r, 350));
   }
-  setStatus('Done — three PNGs: 1080 × 1080, 1080 × 1350, 1920 × 1080.');
+  setStatus('Done — four PNGs: 1080 × 1080, 1080 × 1350, 1920 × 1080, 1080 × 1920.');
 }
 
-// Test hook used by the maker's own checks: renders all three sizes and
+// Test hook used by the maker's own checks: renders all sizes and
 // reports their real pixel dimensions and PNG magic bytes.
 async function probeExports() {
   const results = [];

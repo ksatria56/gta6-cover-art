@@ -7,6 +7,7 @@ export const SIZES = {
   square: { w: 1080, h: 1080, label: '1080 × 1080 · Square' },
   portrait: { w: 1080, h: 1350, label: '1080 × 1350 · Portrait' },
   wide: { w: 1920, h: 1080, label: '1920 × 1080 · Wide' },
+  story: { w: 1080, h: 1920, label: '1080 × 1920 · Story' },
 };
 
 export const LAYOUTS = {
@@ -15,6 +16,7 @@ export const LAYOUTS = {
   fullbleed: { name: 'Full Bleed', blurb: 'one photo edge to edge' },
   tilted: { name: 'Snapshot Stack', blurb: 'tilted polaroids on sunset' },
   strip: { name: 'Film Strip', blurb: 'three stacked bands' },
+  neon: { name: 'Neon Grid', blurb: 'tall hero centre, stacked left, rail right' },
 };
 
 // A grade is a sunset sky, a sun, and the tint the photos get.
@@ -148,6 +150,21 @@ function panelRects(layout, w, h) {
       { x: 0, y: 0, w: 0, h: 0 },
     ];
   }
+  if (layout === 'neon') {
+    // Neon Grid: two stacked panels left, tall hero centre, tall rail
+    // right — a downtown grid above the title band.
+    const photoH = h * 0.72;
+    const leftW = w * 0.28;
+    const centreW = w * 0.4;
+    const rightW = w - leftW - centreW - gap * 4;
+    const halfH = (photoH - gap * 3) / 2;
+    return [
+      { x: gap, y: gap, w: leftW, h: halfH },
+      { x: gap, y: gap * 2 + halfH, w: leftW, h: halfH },
+      { x: gap * 2 + leftW, y: gap, w: centreW, h: photoH - gap * 2 },
+      { x: gap * 3 + leftW + centreW, y: gap, w: rightW, h: photoH - gap * 2 },
+    ];
+  }
   // strip: three horizontal bands + one spare rect for the title zone.
   const gap = Math.round(w * 0.012);
   const bh = (h * 0.72 - gap * 4) / 3;
@@ -168,6 +185,7 @@ function titleZone(layout, w, h) {
   }
   if (layout === 'fullbleed') return { x: 0, y: h * 0.62, w, h: h * 0.38 };
   if (layout === 'tilted') return { x: 0, y: h * 0.82, w, h: h * 0.18 };
+  if (layout === 'neon') return { x: 0, y: h * 0.72, w, h: h * 0.28 };
   return { x: 0, y: h * 0.72, w, h: h * 0.28 }; // strip
 }
 
@@ -524,7 +542,7 @@ export function renderCover(canvas, state, slots) {
     ctx.fillStyle = g;
     ctx.fillRect(0, zone.y - zone.h * 0.3, w, h - zone.y + zone.h * 0.3);
   }
-  if (layout === 'grid' || layout === 'strip') {
+  if (layout === 'grid' || layout === 'strip' || layout === 'neon') {
     ctx.fillStyle = skyGradient(ctx, w, h, grade);
     ctx.fillRect(zone.x, zone.y, zone.w, zone.h);
   }
